@@ -1,36 +1,35 @@
+//Bibek Pokharel
+//Human Computer Interaction Project1
+// Microwave Interface Design
+
+
 import guru.ttslib.*;
 import processing.sound.*;
 PinkNoise noise;
+TTS tts;
 PImage img;
 PImage img1;
-int x=0;
 boolean doorOpening = false;
-int choice = -100;
-int startTime = 0;
-int currentTime = 0;
+boolean open = false;
 String message = "";
-TTS tts;
-
-//int value = 87;
-
+int s;
+int k= 0;
+int timer =0;
+int x=0;
+int choice = -100;
 //*****************************************************************************************
 void setup(){
  size(1200,1200);
- frameRate(3000);
- 
+ frameRate(100);
  img =loadImage("Plate.jpg");
  img1 = loadImage("Power.jpg");
  noise = new PinkNoise(this);
- startTime = millis()/1000;
  tts = new TTS();
- //tts.setPitch(200);
- //tts.setPitchRange(150);
- //tts.setPitchShift( 20.0 );
- 
 }
 //*****************************************************************************************
 
 void draw(){
+  s = second();
   background(255);
   fill(0);
   rect(100,80,1000,600);             //Outer layer of microwave
@@ -48,7 +47,7 @@ void draw(){
   fill(250,221,149);
   textSize(12);
   text( "Warning: Please only use \n microwaveable plastic dishes only, \n do not use steel dishes",400+x,180);
-  fill(255);
+  fill(75,70,64);
   rect(270+x, 250, 250, 250);       // transparent window
   fill(87);
   rect(680, 130, 400, 500);         // Switches menue
@@ -105,7 +104,7 @@ void draw(){
   text("Potato", 880, 455);
   text("Beverage",1000,455);
   text("Defrost",760, 530);
-  text("Timer",880, 530);
+  text("Pizza",880, 530);
   text("Vent Fan",1000, 530);
   text("Start",760, 600);
   text("Stop",880, 600);
@@ -117,21 +116,16 @@ void draw(){
 //***************************************************************************************** 
   
   //Power button
-  fill(250,3,3);
-  ellipse( 730,250,40,40);
-  image(img1, 720,240,20,20);
-  //if (mousePressed &&(mouseX> 710 && mouseX < 750 && mouseY >230 && mouseY < 270)){
-  //  fill(10,203,18);
-  // ellipse( 730,250,40,40);
-  //}
-  
-  if (choice == 21){
-  fill(10,203,18);
-   ellipse( 730,250,40,40);
+if (open == true){
+   //message ="ON";
+   fill(10,203,18);
   }
-  
-  
-  
+  else{
+    //message = "OFF";
+     fill(247,2,2);
+     }
+  ellipse(730,250,40,40);
+  image(img1, 720,240,20,20);
   
 //*****************************************************************************************  
   
@@ -145,42 +139,34 @@ void draw(){
  //If else condition for  door dutton operations 
  if (doorOpening == true){
    text( "Close door", 1000, 600);
-   
-   
  }
   else if( doorOpening == false){
    text(" Open Door" , 1000,600);
-   
  }
  
  // Condition for sliding the door
  if ( doorOpening == true && x <450){
-   text("Door opening...", 850,190);
+   message = "Door opening ...";
    x++;
    
  }
    
   else if(doorOpening == false && x > 0){
     x--;
-    text("Door Closing...", 850,190);
+    message = ("Door Closing...");
     
 }
 //***************************************************************************************** 
  // Condition for numbers operation
- if ( choice >= 0 && choice <= 9  ){
-     text(":", 860, 190);
-    startTimer(60*choice);
-    
-    
+ if ( choice >= 0 && choice <= 9){
+     timer= 60*choice;
  }
  
-//***************************************************************************************** 
- //Settiing 2 minutes for different extra keys
- if(choice >= 11 && choice <=14){
-   text(":", 860, 190);
-   startTimer(120);
+//************************ different extra keys
+
+ if(choice >= 11 && choice <=15){
+   timer = 120;
  }
- 
  //*****************************************************************************************
  // vent fan
  if(choice == 16 ){
@@ -190,17 +176,24 @@ void draw(){
 
  //Resetting to starttime
  if (choice == 18){
-   startTime = millis()/1000;
+    timer = 0;
    noise.stop();
  }
  if(choice == 19){
-   fill(0);
-  rect(730, 180, 300, 30, 10); 
+   message = "Ready";
+   timer =0 ; 
    }
    
    if (choice == 20){
-     startTimer(30);
+     timer=30;
    }
+   
+   if(timer > 0){
+   timer = startTimer(timer);
+   message= ":"+ String.valueOf(timer);
+   choice = -100;
+   }
+    println(timer);
 }
 //***************************************************************************************** 
 
@@ -270,15 +263,15 @@ void draw(){
     tts.speak("2 minutes started for beverage");
    }
    
-   if (mouseX>710 && mouseX<810 && mouseY > 505 && mouseY< 555){
+   if (mouseX>710 && mouseX<810 && mouseY > 505 && mouseY< 555){        //defrost
     choice =14;
     tts.speak("2 minutes started for defrost");
    }
-   if (mouseX>830 && mouseX<930 && mouseY > 505 && mouseY< 555){
+   if (mouseX>830 && mouseX<930 && mouseY > 505 && mouseY< 555){    //pizza
     choice =15;
-    
-   }
-   if (mouseX>950 && mouseX<1050 && mouseY > 505 && mouseY< 555){
+    tts.speak("2 minutes started for Pizza");
+    }
+   if (mouseX>950 && mouseX<1050 && mouseY > 505 && mouseY< 555){   //vent fan
     choice =16;
     tts.speak("vent fan started");
    }
@@ -287,11 +280,11 @@ void draw(){
     
    }
    
-   if (mouseX>830 && mouseX<930 && mouseY > 550 && mouseY< 650){
+   if (mouseX>830 && mouseX<930 && mouseY > 550 && mouseY< 650){     //stop button
     choice =18;
     tts.speak("Operation stopped");
    }
-   if (mouseX>770 && mouseX<830 && mouseY > 380 && mouseY< 420){  //clear button
+   if (mouseX>770 && mouseX<830 && mouseY > 380 && mouseY< 420){        //clear button
     choice =19;
    }
    
@@ -301,23 +294,26 @@ void draw(){
      }
      if (mouseX > 710 && mouseX < 750 && mouseY > 230 && mouseY <270){
      choice = 21;
+     open ^= true;
+     
+     if( open == true){ 
+         tts.speak("Power on");
+      } else{
+         tts.speak("power off");
+      }
+     
  }
  }
-   //if (value == 87){
-   //  fill(10,203,18);
-   //  ellipse( 730,250,40,40);
-   //}else{
-   //  value =87;
-   //}
-
- 
+   
  //Function for timer 
- void startTimer(int t){
-   currentTime = millis()/1000 - startTime;
-   if (t- currentTime > 0){
-     message = String.valueOf(t-currentTime);
+ int startTimer(int t){
+   if ( s > k){
+     t= t-1;
    }
    else{
+     
      message = "START";
  }
+ k=s;
+ return t;
  }
