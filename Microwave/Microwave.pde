@@ -11,12 +11,17 @@ PImage img;
 PImage img1;
 boolean doorOpening = false;
 boolean open = false;
+boolean stop = false;
 String message = "";
 int s;
 int k= 0;
 int timer =0;
 int x=0;
 int choice = -100;
+int temp ;
+int resume ;
+boolean cont = false;
+
 //*****************************************************************************************
 void setup(){
  size(1200,1200);
@@ -43,6 +48,7 @@ void draw(){
   fill(0);
   
   fill(124,99,99);
+   
   rect(250+x, 150, 300, 60);
   fill(250,221,149);
   textSize(12);
@@ -106,7 +112,7 @@ void draw(){
   text("Defrost",760, 530);
   text("Pizza",880, 530);
   text("Vent Fan",1000, 530);
-  text("Start",760, 600);
+  text("Resume",760, 600);
   text("Stop",880, 600);
   text("Clear",800,400);
   text(message, 880, 190);      
@@ -160,12 +166,26 @@ if (open == true){
  // Condition for numbers operation
  if ( choice >= 0 && choice <= 9){
      timer= 60*choice;
+       cont = true;
+    // temp = choice;
+     
+     
+ }
+ if (choice == 17){
+ //timer = resume;
+  timer = startTimer(resume);
+  message= ":"+ String.valueOf(timer);
+   //timer =  60* temp;
  }
  
-//************************ different extra keys
+ 
+//************************ 
+//different extra keys
 
  if(choice >= 11 && choice <=15){
+   cont = true;
    timer = 120;
+    
  }
  //*****************************************************************************************
  // vent fan
@@ -173,27 +193,35 @@ if (open == true){
    noise.play();
  }
 //*****************************************************************************************
-
- //Resetting to starttime
+// stop button
+ //Resetting to starttime 
  if (choice == 18){
-    timer = 0;
+   stop = true;
    noise.stop();
+   cont = false;
  }
+ // clear button
  if(choice == 19){
    message = "Ready";
    timer =0 ; 
-   }
-   
+ 
+ } 
    if (choice == 20){
      timer=30;
-   }
-   
-   if(timer > 0){
-   timer = startTimer(timer);
-   message= ":"+ String.valueOf(timer);
-   choice = -100;
-   }
+   } 
+   if(stop == false || cont == true){
+     if(timer > 0){
+        timer = startTimer(timer);
+       message= ":"+ String.valueOf(timer);
+       choice = -100;
+     }
     println(timer);
+  }
+  else {    // if stop = true , resume stored the value of current time
+   
+    resume = timer;
+    
+  }
 }
 //***************************************************************************************** 
 
@@ -275,9 +303,10 @@ if (open == true){
     choice =16;
     tts.speak("vent fan started");
    }
-   if (mouseX>710 && mouseX<810 && mouseY > 550 && mouseY< 650){
+   if (mouseX>710 && mouseX<810 && mouseY > 575 && mouseY< 625){
     choice =17;
-    
+    tts.speak("Operation Resumed");
+   
    }
    
    if (mouseX>830 && mouseX<930 && mouseY > 550 && mouseY< 650){     //stop button
@@ -317,3 +346,5 @@ if (open == true){
  k=s;
  return t;
  }
+ 
+ 
